@@ -1,0 +1,13 @@
+{
+  "title": "pro-djlink-manager",
+  "description": "PRO DJ LINK Bridge を介して DJプレイの状態を読み取り、照明・映像・ドリンクメニュー・ロボットなどの会場システムを制御するライブオーケストレーションアプリ。",
+  "title_en": "pro-djlink-manager",
+  "description_en": "A live orchestration app that reads DJ playback state through Pro DJ Link Bridge and controls lighting, video, drink-menu interfaces, robots, and other venue systems.",
+  "tags": [
+    "Installation",
+    "Web",
+    "OSC",
+    "DJ"
+  ],
+  "year": "2026"
+}

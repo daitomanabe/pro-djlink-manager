@@ -1,0 +1,31 @@
+{
+  "name": "pro-djlink-manager",
+  "version": "1.0.0",
+  "description": "A live orchestration app that reads Pro DJ Link Bridge playback state and controls lighting, video, drink menus, robots, and other venue systems over OSC.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/dummy-playback.js && node --check src/prolink-emulator.js && node --check src/prolink-remotedb.js",
+    "capture:dummy": "node scripts/capture_dummy_screenshots.mjs",
+    "emulator": "node src/prolink-emulator.js"
+  },
+  "keywords": [
+    "pro-dj-link",
+    "osc",
+    "touchdesigner",
+    "lighting",
+    "visualizer"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "node-tcnet": "^0.1.6",
+    "openai": "^6.27.0",
+    "osc": "^2.4.5",
+    "tslib": "^2.8.1",
+    "ws": "^8.19.0"
+  }
+}

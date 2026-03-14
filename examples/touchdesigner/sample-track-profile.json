@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "generatedAt": "2026-03-14T06:31:18.662Z",
+  "track": {
+    "layer": 3,
+    "trackId": 4100,
+    "title": "Xylq Drift-3",
+    "artist": "Daito Manabe",
+    "trackKey": 1000,
+    "state": "PLAYING",
+    "currentPosition": 6043,
+    "trackLength": 330000,
+    "bpm": 108,
+    "beatMarker": 10,
+    "selectionMode": "balanced",
+    "selectionReason": "state:playing, mixer-level, explicit-master, transport-advancing, recent-play-start, recent-track-load, early-position, first-30s-window",
+    "selectionScore": 526.48,
+    "detectedAt": "2026-03-14T06:31:18.662Z"
+  },
+  "playback": {
+    "layer": 3,
+    "state": "PLAYING",
+    "currentPositionMs": 6043,
+    "trackLengthMs": 330000,
+    "detectedAt": "2026-03-14T06:31:18.662Z"
+  },
+  "selection": {
+    "mode": "balanced",
+    "selectedLayer": 3,
+    "masterLayer": 3,
+    "masterSignalAvailable": true,
+    "mixerSignalAvailable": true,
+    "candidates": [
+      {
+        "layer": 3,
+        "trackId": 4100,
+        "trackTitle": "Xylq Drift-3",
+        "trackArtist": "Daito Manabe",
+        "score": 526.48,
+        "reasons": [
+          {
+            "label": "state:playing",
+            "score": 140
+          },
+          {
+            "label": "mixer-level",
+            "score": 120.96
+          },
+          {
+            "label": "explicit-master",
+            "score": 90
+          },
+          {
+            "label": "transport-advancing",
+            "score": 55
+          },
+          {
+            "label": "recent-play-start",
+            "score": 52.23
+          },
+          {
+            "label": "recent-track-load",
+            "score": 18.1
+          },
+          {
+            "label": "early-position",
+            "score": 16.19
+          },
+          {
+            "label": "first-30s-window",
+            "score": 34
+          }
+        ]
+      },
+      {
+        "layer": 1,
+        "trackId": 4114,
+        "trackTitle": "Zyph Shift-6",
+        "trackArtist": "Daito Manabe",
+        "score": 265.19,
+        "reasons": [
+          {
+            "label": "state:looping",
+            "score": 135
+          },
+          {
+            "label": "mixer-level",
+            "score": 23.18
+          },
+          {
+            "label": "recent-play-start",
+            "score": 55
+          },
+          {
+            "label": "recent-track-load",
+            "score": 6.41
+          },
+          {
+            "label": "early-position",
+            "score": 11.6
+          },
+          {
+            "label": "first-30s-window",
+            "score": 34
+          }
+        ]
+      },
+      {
+        "layer": 2,
+        "trackId": 4115,
+        "trackTitle": "Linthe Vector Grid",
+        "trackArtist": "Daito Manabe",
+        "score": 227.48,
+        "reasons": [
+          {
+            "label": "state:paused",
+            "score": 40
+          },
+          {
+            "label": "mixer-level",
+            "score": 2.52
+          },
+          {
+            "label": "transport-advancing",
+            "score": 55
+          },
+          {
+            "label": "recent-play-start",
+            "score": 42.1
+          },
+          {
+            "label": "recent-track-load",
+            "score": 12.2
+          },
+          {
+            "label": "early-position",
+            "score": 9.66
+          },
+          {
+            "label": "first-30s-window",
+            "score": 34
+          },
+          {
+            "label": "sticky-incumbent",
+            "score": 32
+          }
+        ]
+      },
+      {
+        "layer": 4,
+        "trackId": 4101,
+        "trackTitle": "Qern Grid Fold",
+        "trackArtist": "Daito Manabe",
+        "score": 162.9,
+        "reasons": [
+          {
+            "label": "state:paused",
+            "score": 40
+          },
+          {
+            "label": "mixer-level",
+            "score": 5.04
+          },
+          {
+            "label": "recent-play-start",
+            "score": 44.86
+          },
+          {
+            "label": "recent-track-load",
+            "score": 24
+          },
+          {
+            "label": "early-position",
+            "score": 15
+          },
+          {
+            "label": "first-30s-window",
+            "score": 34
+          }
+        ]
+      }
+    ],
+    "reason": "state:playing, mixer-level, explicit-master, transport-advancing, recent-play-start, recent-track-load, early-position, first-30s-window"
+  },
+  "analysis": {
+    "hasAtmosphere": true,
+    "ruleBased": {
+      "generatedAt": "2026-03-14T06:31:18.662Z",
+      "ruleSource": "bridge-telemetry",
+      "deterministic": {
+        "state": "PLAYING",
+        "isTransportAdvancing": true,
+        "currentPositionMs": 6043,
+        "trackLengthMs": 330000,
+        "bpm": 108,
+        "tempoBand": "mid_slow",
+        "trackWindow": "intro",
+        "playbackRole": "freshly_started",
+        "energy": 53,
+        "flags": [
+          "transport_advancing",
+          "new_track_window",
+          "selected_as_audible",
+          "master_correlated"
+        ],
+        "confidence": 1
+      },
+      "selection": {
+        "mode": "balanced",
+        "selectedLayer": 3,
+        "masterLayer": 3,
+        "masterSignalAvailable": true,
+        "mixerSignalAvailable": true,
+        "score": 526.48,
+        "reason": "state:playing, mixer-level, explicit-master, transport-advancing, recent-play-start, recent-track-load, early-position, first-30s-window"
+      }
+    },
+    "atmosphere": {
+      "basis": "Simulated GPT atmosphere for manual capture. Derived from synthetic metadata and mixer telemetry.",
+      "confidence": 0.82,
+      "likelyGenres": [
+        "abstract techno",
+        "broken electro",
+        "machine funk"
+      ],
+      "moods": [
+        "warm",
+        "alien",
+        "patient"
+      ],
+      "textures": [
+        "hollow kicks",
+        "satin pads",
+        "metal filaments"
+      ],
+      "visualKeywords": [
+        "offset lattices",
+        "raster pulses",
+        "cold halos"
+      ],
+      "colorPalette": [
+        "graphite",
+        "cold silver",
+        "ice cyan"
+      ],
+      "atmosphereSummary": "A tensile, nocturnal rhythm frame with matte sub pulses, shaved snares, and folded noise. The groove feels focused and architectural rather than explosive, holding tension inside a clipped monochrome field before opening into monochrome waveforms and floating markers accents. In the room it reads as obsidian, white smoke, and steel blue with a disciplined, machine-soul pulse.",
+      "playbackRole": "freshly_started",
+      "source": "dummy-manual-mode",
+      "title": "Xylq Drift-3",
+      "artist": "Daito Manabe",
+      "trackId": 4100,
+      "layer": 3
+    }
+  }
+}

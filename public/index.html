@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>pro-djlink-manager</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <section class="brand-block">
+          <p class="eyebrow">PRO-DJLINK-MANAGER</p>
+          <h1>ON AIR MONITOR</h1>
+          <p class="lede">Lighting / Video / Menu / Robot control surface</p>
+          <div class="hero-status" id="bridgeHeadlineStatus">Bridge: Disconnected</div>
+        </section>
+
+        <section class="status-ribbon" aria-label="System Status">
+          <article class="status-tile">
+            <span class="status-label">Bridge</span>
+            <strong id="bridgeStatusText">Disconnected</strong>
+            <small id="bridgeMetaText">Network interface not selected</small>
+          </article>
+          <article class="status-tile">
+            <span class="status-label">OSC Target</span>
+            <strong id="oscStatusText">127.0.0.1:29001</strong>
+            <small id="oscMetaText">Ready to send</small>
+          </article>
+          <article class="status-tile">
+            <span class="status-label">Audible Track</span>
+            <strong id="currentTrackTitle">No active track</strong>
+            <small id="currentTrackMeta">Waiting for Bridge data</small>
+          </article>
+          <article class="status-tile">
+            <span class="status-label">OpenAI</span>
+            <strong id="analysisStatusText">Not configured</strong>
+            <small id="analysisMetaText">Set OPENAI_API_KEY to enable analysis</small>
+          </article>
+        </section>
+
+        <aside class="control-stack">
+          <div class="button-row">
+            <button id="connectButton" class="button" type="button">Connect</button>
+            <button id="disconnectButton" class="button button-secondary" type="button">Disconnect</button>
+            <button id="testOscButton" class="button button-secondary" type="button">Test OSC</button>
+            <button id="analyzeButton" class="button button-secondary" type="button">Analyze</button>
+          </div>
+
+          <details class="settings-drawer">
+            <summary>Control Surface</summary>
+            <div class="settings-drawer-body">
+              <form id="settingsForm" class="settings-grid">
+                <label>
+                  <span>TCNet / Bridge Interface</span>
+                  <select id="bridgeInterface" name="bridgeInterface"></select>
+                </label>
+                <label>
+                  <span>OSC Host</span>
+                  <input id="oscHost" name="oscHost" type="text" placeholder="127.0.0.1" />
+                </label>
+                <label>
+                  <span>OSC Port</span>
+                  <input id="oscPort" name="oscPort" type="number" min="1" max="65535" placeholder="29001" />
+                </label>
+                <label>
+                  <span>Current Track Address</span>
+                  <input
+                    id="currentTrackAddress"
+                    name="currentTrackAddress"
+                    type="text"
+                    placeholder="/pro-dj-link/currentTrack"
+                  />
+                </label>
+                <label>
+                  <span>Track Changed Address</span>
+                  <input
+                    id="trackChangedAddress"
+                    name="trackChangedAddress"
+                    type="text"
+                    placeholder="/pro-dj-link/trackChanged"
+                  />
+                </label>
+                <label>
+                  <span>Track Profile Address</span>
+                  <input
+                    id="trackProfileAddress"
+                    name="trackProfileAddress"
+                    type="text"
+                    placeholder="/pro-dj-link/trackProfile"
+                  />
+                </label>
+                <label>
+                  <span>Test Address</span>
+                  <input id="testAddress" name="testAddress" type="text" placeholder="/pro-dj-link/test" />
+                </label>
+                <label>
+                  <span>Selection Mode</span>
+                  <select id="selectionMode" name="selectionMode">
+                    <option value="balanced">Balanced</option>
+                    <option value="master_first">Master First</option>
+                    <option value="recent_start">Recent Start</option>
+                    <option value="lowest_position">Lowest Position</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Selection Hold (sec)</span>
+                  <input id="selectionHoldSeconds" name="selectionHoldSeconds" type="number" min="0" max="120" />
+                </label>
+                <label>
+                  <span>OpenAI Model</span>
+                  <input id="analysisModel" name="analysisModel" type="text" placeholder="gpt-5-mini" />
+                </label>
+                <label class="checkbox-field">
+                  <span>Auto Analyze</span>
+                  <input id="analysisAutoAnalyze" name="analysisAutoAnalyze" type="checkbox" />
+                </label>
+                <label class="settings-wide">
+                  <span>Analysis Focus</span>
+                  <textarea
+                    id="analysisFocus"
+                    name="analysisFocus"
+                    rows="3"
+                    placeholder="Infer atmosphere, moods, textures, and visual cues from metadata only."
+                  ></textarea>
+                </label>
+              </form>
+
+              <div class="drawer-footer">
+                <p class="hint">Bridge / OSC service is running in src/server.js. This layer is visualization only.</p>
+                <button id="saveButton" class="button" type="button">Save Settings</button>
+              </div>
+            </div>
+          </details>
+
+          <p class="flash" id="flashMessage" hidden></p>
+        </aside>
+      </header>
+
+      <main class="workspace">
+        <nav class="view-tabs" aria-label="Display Views">
+          <button class="tab-button is-active" type="button" data-view="onair" aria-selected="true">On Air</button>
+          <button class="tab-button" type="button" data-view="monitor" aria-selected="false">Input Monitor</button>
+          <button class="tab-button" type="button" data-view="visualizer" aria-selected="false">Visualizer</button>
+        </nav>
+
+        <section class="view-panel is-active" data-view-panel="onair">
+          <div class="onair-layout">
+            <section class="panel overview-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Current Playback</p>
+                  <h2>Now Playing + Atmosphere</h2>
+                </div>
+                <div class="mini-badge-group">
+                  <span class="mini-badge">
+                    <span class="badge-label">Mode</span>
+                    <strong id="selectionModeDetail">balanced</strong>
+                  </span>
+                  <span class="mini-badge">
+                    <span class="badge-label">Selected</span>
+                    <strong id="selectionLayerDetail">-</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div class="overview-grid">
+                <article class="focus-track">
+                  <div class="focus-title-block">
+                    <h3 id="detailTitle">No active track</h3>
+                    <p id="detailArtist">-</p>
+                  </div>
+
+                  <div class="progress-stage">
+                    <div class="progress-track">
+                      <div class="progress-fill" id="currentTrackProgressFill"></div>
+                    </div>
+                    <p class="progress-caption" id="detailPosition">-</p>
+                  </div>
+
+                  <dl class="metric-grid">
+                    <div class="metric-card">
+                      <dt>Layer</dt>
+                      <dd id="detailLayer">-</dd>
+                    </div>
+                    <div class="metric-card">
+                      <dt>Track ID</dt>
+                      <dd id="detailTrackId">-</dd>
+                    </div>
+                    <div class="metric-card">
+                      <dt>Changed At</dt>
+                      <dd id="detailChangedAt">-</dd>
+                    </div>
+                    <div class="metric-card">
+                      <dt>Energy</dt>
+                      <dd id="analysisEnergy">-</dd>
+                    </div>
+                    <div class="metric-card">
+                      <dt>Confidence</dt>
+                      <dd id="analysisConfidence">-</dd>
+                    </div>
+                    <div class="metric-card">
+                      <dt>Mix Role</dt>
+                      <dd id="analysisMixRole">-</dd>
+                    </div>
+                  </dl>
+                </article>
+
+                <article class="focus-atmosphere">
+                  <div class="analysis-strip">
+                    <span class="status-label">GPT Atmosphere</span>
+                    <p class="analysis-summary" id="analysisSummary">No analysis yet.</p>
+                  </div>
+
+                  <div class="analysis-grid">
+                    <div class="analysis-line">
+                      <span class="analysis-line-label">Basis</span>
+                      <p id="analysisBasis">-</p>
+                    </div>
+                    <div class="analysis-line">
+                      <span class="analysis-line-label">Genres</span>
+                      <div id="analysisGenres" class="analysis-inline"></div>
+                    </div>
+                    <div class="analysis-line">
+                      <span class="analysis-line-label">Moods</span>
+                      <div id="analysisMoods" class="analysis-inline"></div>
+                    </div>
+                    <div class="analysis-line">
+                      <span class="analysis-line-label">Textures</span>
+                      <div id="analysisTextures" class="analysis-inline"></div>
+                    </div>
+                    <div class="analysis-line">
+                      <span class="analysis-line-label">Visuals</span>
+                      <div id="analysisVisuals" class="analysis-inline"></div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel ops-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Mixer / Routing</p>
+                  <h2>Channel Audibility + OSC</h2>
+                </div>
+              </div>
+
+              <div class="ops-grid">
+                <article class="ops-block mixer-block">
+                  <div class="ops-head">
+                    <span class="section-tag">Mixer</span>
+                    <span class="ops-note" id="mixerTelemetryNote">Waiting for deck telemetry.</span>
+                  </div>
+
+                  <div class="mixer-summary">
+                    <div class="mixer-meta">
+                      <span class="status-label">Master</span>
+                      <strong id="selectionMasterDetail">Unavailable</strong>
+                    </div>
+                    <div class="mixer-meta">
+                      <span class="status-label">Feed</span>
+                      <strong id="selectionMixerDetail">Unavailable</strong>
+                    </div>
+                  </div>
+
+                  <div id="channelMeters" class="channel-meter-grid"></div>
+                </article>
+
+                <article class="ops-block routing-block">
+                  <div class="ops-head">
+                    <span class="section-tag">OSC Output</span>
+                  </div>
+
+                  <div class="route-compact">
+                    <div class="route-line">
+                      <span class="status-label">Target</span>
+                      <strong id="routeTarget">127.0.0.1:29001</strong>
+                    </div>
+                    <div class="route-line">
+                      <span class="status-label">State</span>
+                      <small id="routeTargetMeta">Ready to send</small>
+                    </div>
+                    <div class="route-line route-line-stack">
+                      <span class="status-label">Addresses</span>
+                      <code id="routeCurrentAddress">/pro-dj-link/currentTrack</code>
+                      <code id="routeChangedAddress">/pro-dj-link/trackChanged</code>
+                      <code id="routeProfileAddress">/pro-dj-link/trackProfile</code>
+                    </div>
+                    <div class="route-line">
+                      <span class="status-label">Saved Profile</span>
+                      <strong id="routeProfilePath">No profile saved yet</strong>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel matrix-panel">
+              <div class="matrix-grid">
+                <section class="deck-zone">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">CDJ Telemetry</p>
+                      <h2>Deck Matrix</h2>
+                    </div>
+                  </div>
+                  <div id="layerGrid" class="deck-grid"></div>
+                </section>
+
+                <aside class="side-zone">
+                  <article class="side-block">
+                    <div class="ops-head">
+                      <span class="section-tag">Rule-Based Selection</span>
+                    </div>
+                    <p class="selection-reason" id="selectionReasonText">Waiting for deck telemetry.</p>
+                    <div id="selectionList" class="candidate-list"></div>
+                  </article>
+
+                  <article class="side-block">
+                    <div class="ops-head">
+                      <span class="section-tag">Recent Activity</span>
+                    </div>
+                    <ul id="eventList" class="event-list"></ul>
+                  </article>
+                </aside>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view-panel" data-view-panel="monitor" hidden>
+          <div class="monitor-layout">
+            <section class="monitor-ribbon" aria-label="Monitoring Overview">
+              <article class="status-tile compact">
+                <span class="status-label">Bridge Link</span>
+                <strong id="monitorBridgeState">Disconnected</strong>
+                <small id="monitorBridgeMeta">No interface selected</small>
+              </article>
+              <article class="status-tile compact">
+                <span class="status-label">Deck Feed</span>
+                <strong id="monitorDeckCoverage">0 / 0</strong>
+                <small id="monitorDeckCoverageMeta">No layers observed</small>
+              </article>
+              <article class="status-tile compact">
+                <span class="status-label">Transport</span>
+                <strong id="monitorTransportState">0 moving</strong>
+                <small id="monitorTransportMeta">Waiting for playback</small>
+              </article>
+              <article class="status-tile compact">
+                <span class="status-label">Mixer Engine</span>
+                <strong id="monitorMixerState">Unavailable</strong>
+                <small id="monitorMixerStateMeta">No selection yet</small>
+              </article>
+            </section>
+
+            <div class="monitor-grid">
+              <section class="panel monitor-cdj-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">CDJ Input Monitor</p>
+                    <h2>Deck Reception + Transport</h2>
+                  </div>
+                </div>
+                <div id="monitorLayerGrid" class="monitor-layer-grid"></div>
+              </section>
+
+              <aside class="monitor-side">
+                <article class="panel monitor-mixer-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">Mixer Monitor</p>
+                      <h2>Channel Monitoring</h2>
+                    </div>
+                  </div>
+                  <div class="monitor-mixer-meta">
+                    <div class="mixer-meta">
+                      <span class="status-label">Source</span>
+                      <strong id="monitorMixerFeed">Estimated</strong>
+                    </div>
+                    <div class="mixer-meta">
+                      <span class="status-label">Selected</span>
+                      <strong id="monitorMainDeck">-</strong>
+                    </div>
+                    <div class="mixer-meta">
+                      <span class="status-label">Master</span>
+                      <strong id="monitorMasterDeck">Unavailable</strong>
+                    </div>
+                    <div class="mixer-meta">
+                      <span class="status-label">Hold</span>
+                      <strong id="monitorHoldTime">0 sec</strong>
+                    </div>
+                  </div>
+                  <p
+                    class="selection-reason"
+                    id="monitorMixerReason"
+                    data-fit-text
+                    data-fit-box="self"
+                    data-fit-axis="width"
+                    data-fit-min="8.5"
+                    data-fit-max="9.5"
+                  >
+                    Waiting for mixer inference.
+                  </p>
+                  <div id="monitorChannelMeters" class="channel-meter-grid monitor-channel-grid"></div>
+                </article>
+
+                <article class="panel monitor-engine-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">Selection Engine</p>
+                      <h2>Why This Deck Wins</h2>
+                    </div>
+                  </div>
+                  <p
+                    class="selection-reason"
+                    id="monitorSelectionSummary"
+                    data-fit-text
+                    data-fit-box="self"
+                    data-fit-axis="width"
+                    data-fit-min="8.5"
+                    data-fit-max="10"
+                  >
+                    Waiting for rule-based scoring.
+                  </p>
+                  <div id="monitorReasonTokens" class="monitor-reason-grid"></div>
+                  <div id="monitorSelectionList" class="candidate-list monitor-candidate-list"></div>
+                </article>
+
+                <article class="panel monitor-activity-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">Recent Activity</p>
+                      <h2>Signal Events</h2>
+                    </div>
+                  </div>
+                  <ul id="monitorEventList" class="event-list monitor-event-list"></ul>
+                </article>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel visualizer-panel" data-view-panel="visualizer" hidden>
+          <div class="mix-visualizer-frame">
+            <canvas id="mixVisualizerCanvas" class="mix-visualizer-canvas" aria-label="Mix state visualizer"></canvas>
+            <div class="mix-visualizer-hud" aria-hidden="true">
+              <section class="viz-meta-panel">
+                <span class="viz-kicker">On Air Signal</span>
+                <strong id="vizCurrentTrack">No active track</strong>
+                <p id="vizCurrentMeta">Waiting for transport</p>
+              </section>
+
+              <section class="viz-radar-panel">
+                <div class="viz-panel-head">
+                  <span>Beat Grid</span>
+                  <span>Phase</span>
+                </div>
+                <div id="vizBeatRadar" class="viz-beat-radar"></div>
+              </section>
+
+              <section class="viz-bottom-dock">
+                <div class="viz-master-wave-panel">
+                  <div class="viz-panel-head">
+                    <span>Composite Wave</span>
+                    <span id="vizMasterStats">No source</span>
+                  </div>
+                  <svg
+                    id="vizMasterWave"
+                    class="viz-master-wave"
+                    viewBox="0 0 960 180"
+                    preserveAspectRatio="none"
+                    role="img"
+                    aria-label="Composite waveform"
+                  ></svg>
+                </div>
+                <div id="vizDeckWaveGrid" class="viz-deck-wave-grid"></div>
+              </section>
+
+              <section class="viz-meter-panel">
+                <div class="viz-panel-head">
+                  <span>VU</span>
+                  <span>Decks</span>
+                </div>
+                <div id="vizMeterStack" class="viz-meter-stack"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/mix-visualizer.js" defer></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

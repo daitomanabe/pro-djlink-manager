@@ -1,0 +1,12 @@
+node_modules
+.DS_Store
+.env
+.env.local
+.env.*
+!.env.example
+data/track-profiles
+scripts/__pycache__
+*.pyc
+*.pyo
+.projects-daito-ws-export
+*.tgz
